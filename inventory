@@ -1,0 +1,2 @@
+[meraki]
+merakiapi authkey=<key> organisation=<org>
