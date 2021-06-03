@@ -27,7 +27,7 @@
 # ======================================================
 
   tasks:
-  - name: TASK1 - Query access lists
+  - name: TASK1 - Change ACL on Meraki MX firewall
     meraki_mx_l3_firewall:
       auth_key:  "{{ authkey }}"
       org_name:  "{{ organisation }}"
