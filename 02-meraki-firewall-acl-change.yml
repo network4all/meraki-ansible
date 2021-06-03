@@ -1,0 +1,50 @@
+# A. Kuindersma, 03-06-2021
+#
+# Warning: This script will REPLACE the current ACL with this ACL
+#
+# Usage: /usr/bin/ansible-playbook -i inventory 02-meraki-firewall-acl-change.yml
+#
+# Inventory:
+# [meraki]
+# meraki authkey=<authkey> organisation=<Organisation_name>
+#
+
+- name: Queryscript
+  hosts: meraki
+  connection: local
+  gather_facts: no
+
+  vars:
+
+# ======================================================
+    netname: "01-Testomgeving"
+    state: "present"
+    myrules:
+    - { comment: "Test1", src_cidr: "10.10.1.0/24", src_port: "any", dest_cidr: "192.0.1.6/32", dest_port: "any", protocol: "any", policy: "allow", syslog: "true" }
+    - { comment: "Test2", src_cidr: "10.10.1.0/24", src_port: "any", dest_cidr: "192.0.2.7/32", dest_port: "any", protocol: "any", policy: "allow", syslog: "true" }
+    - { comment: "Test3", src_cidr: "10.10.1.0/24", src_port: "any", dest_cidr: "192.0.3.8/32", dest_port: "any", protocol: "any", policy: "allow", syslog: "true" }
+
+# ======================================================
+
+  tasks:
+  - name: TASK1 - Query access lists
+    meraki_mx_l3_firewall:
+      auth_key:  "{{ authkey }}"
+      org_name:  "{{ organisation }}"
+      net_name:  "{{ netname }}"
+      state:     "{{ state }}"
+      rules: |
+        [
+        {% for var in myrules %}
+        {{ '{' }}
+          'comment':   '{{ var.comment   }}',
+          'src_cidr':  '{{ var.src_cidr  }}',
+          'src_port':  '{{ var.src_port  }}',
+          'dest_cidr': '{{ var.dest_cidr }}',
+          'dest_port': '{{ var.dest_port }}',
+          'protocol':  '{{ var.protocol  }}',
+          'policy':    '{{ var.policy    }}'
+        {{ '}' }},
+        {% endfor %}
+        ]
+...
